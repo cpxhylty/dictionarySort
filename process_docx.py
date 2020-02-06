@@ -34,9 +34,12 @@ def fromParatoPara(parato, parafrom):
                 r._element.rPr.rFonts.set(qn('w:eastAsia'), run.font.name)
         r.bold = run.bold
 
+docxNamefrom = '杨晓雨1月（6701-6750）的副本.docx'
+docxNameto = 'test.docx'
 
-document = Document('杨晓雨1月（6701-6750）的副本.docx')
-document2 = Document('test.docx')
+
+document = Document(docxNamefrom)
+document2 = Document(docxNameto)
 startParas = []  # 每个词的第一段
 
 # 把doc2已有词条加入列表(至少手动添加一个1234zzzz)
@@ -47,10 +50,10 @@ for paragraph in document2.paragraphs:
 count = 0
 for paragraph in document.paragraphs:
     if re.match('\d{4}', paragraph.text) is not None:  # 是startpara
-        ParagraphPY = Pinyin(paragraph.runs[4].text)  # 生成Pinyin并比较,找插入的位置
+        ParagraphPY = Pinyin(paragraph.runs[2].text)  # 生成Pinyin并比较,找插入的位置
         indexStartPara = 0
         for startPara in startParas:
-            startParaPY = Pinyin(startPara.runs[4].text)
+            startParaPY = Pinyin(startPara.runs[2].text)
             if ParagraphPY < startParaPY:
                 length = len(document2.paragraphs)
                 for order in range(length):
@@ -65,5 +68,5 @@ for paragraph in document.paragraphs:
     else:  # 不是startpara
         paraInsert = paraBase.insert_paragraph_before()
         fromParatoPara(paraInsert, paragraph)
-document2.save('test.docx')
+document2.save(docxNameto)
 print('finish')

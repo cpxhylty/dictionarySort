@@ -20,15 +20,22 @@ class Pinyin:
 
 
 def fromParatoPara(parato, parafrom):
+    parato.paragraph_format.first_line_indent = parafrom.paragraph_format.first_line_indent
+    parato.paragraph_format.left_indent = parafrom.paragraph_format.left_indent
+    parato.paragraph_format.line_spacing = parafrom.paragraph_format.line_spacing
     for run in parafrom.runs:
         r = parato.add_run(run.text)
-        r.font.name = run.font.name
-        if r._element.rPr.rFonts is not None:
-            r._element.rPr.rFonts.set(qn('w:eastAsia'), run.font.name)
+        if run.font.name is None:
+            r.font.name = '宋体'
+            r._element.rPr.rFonts.set(qn('w:eastAsia'), '宋体')
+        else:
+            r.font.name = run.font.name
+            if r._element.rPr.rFonts is not None:
+                r._element.rPr.rFonts.set(qn('w:eastAsia'), run.font.name)
         r.bold = run.bold
 
 
-document = Document('李安涛1月（6601-6650）.docx')
+document = Document('杨晓雨1月（6701-6750）的副本.docx')
 document2 = Document('test.docx')
 startParas = []  # 每个词的第一段
 
@@ -47,7 +54,7 @@ for paragraph in document.paragraphs:
             if ParagraphPY < startParaPY:
                 length = len(document2.paragraphs)
                 for order in range(length):
-                    if document2.paragraphs[order].text == startPara.text:
+                    if re.match('\d{4}', document2.paragraphs[order].text) is not None and document2.paragraphs[order].text == startPara.text:
                         paraBase = document2.paragraphs[order] # 在paraBase前插入新词条
                         break
                 break

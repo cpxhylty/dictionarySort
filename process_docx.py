@@ -2,6 +2,12 @@ from docx import Document
 from docx.oxml.ns import qn
 import re
 
+# steps:
+# 1.跑removeStartParaSpace
+# 2.最前边留一个空段落，跑宏
+# 3.目标文件最后边需要有zzzz段落
+# 4.跑process_docx
+
 class Pinyin:
     def __init__(self, pinyin):
         self.content = pinyin  # real pinyin
@@ -50,10 +56,10 @@ for paragraph in document2.paragraphs:
 count = 0
 for paragraph in document.paragraphs:
     if re.match('\d{4}', paragraph.text) is not None:  # 是startpara
-        ParagraphPY = Pinyin(paragraph.runs[2].text)  # 生成Pinyin并比较,找插入的位置
+        ParagraphPY = Pinyin(re.search('([āáǎàōóǒòēéěèīíǐìūúǔùǖǘǚǜüa-z])+', paragraph.text).group(0))  # 生成Pinyin并比较,找插入的位置
         indexStartPara = 0
         for startPara in startParas:
-            startParaPY = Pinyin(startPara.runs[2].text)
+            startParaPY = Pinyin(re.search('([āáǎàōóǒòēéěèīíǐìūúǔùǖǘǚǜüa-z])+', startPara.text).group(0))
             if ParagraphPY < startParaPY:
                 length = len(document2.paragraphs)
                 for order in range(length):

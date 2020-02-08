@@ -1,12 +1,15 @@
 from docx import Document
 from docx.oxml.ns import qn
 import re
+import time
 
 # steps:
-# 1.跑removeStartParaSpace
-# 2.最前边留一个空段落，跑宏
-# 3.目标文件最后边需要有zzzz段落
-# 4.跑process_docx
+# 1.源文件跑removeStartParaSpace，cmd+A cmd+shift+f9去除超链接
+# 2.源文件最前边留一个空段落，跑modify宏
+# 3.源文件英文字体全改为同中文
+# 4.目标文件最后边需要有1234zzzz段落
+# 5.删掉源文件的第一个空段落，跑process_docx
+# 6.目标文件英文字体全改times
 
 class Pinyin:
     def __init__(self, pinyin):
@@ -35,14 +38,16 @@ def fromParatoPara(parato, parafrom):
             r.font.name = '宋体'
             r._element.rPr.rFonts.set(qn('w:eastAsia'), '宋体')
         else:
+            r.font.name = '宋体'
             r.font.name = run.font.name
             if r._element.rPr.rFonts is not None:
                 r._element.rPr.rFonts.set(qn('w:eastAsia'), run.font.name)
         r.bold = run.bold
 
-docxNamefrom = '杨晓雨1月（6701-6750）的副本.docx'
-docxNameto = 'test.docx'
+docxNamefrom = '金梦城1月（6551-6600） .docx'
+docxNameto = 'test3.docx'
 
+start = time.perf_counter()
 
 document = Document(docxNamefrom)
 document2 = Document(docxNameto)
@@ -56,6 +61,8 @@ for paragraph in document2.paragraphs:
 count = 0
 for paragraph in document.paragraphs:
     if re.match('\d{4}', paragraph.text) is not None:  # 是startpara
+        count += 1
+        print(paragraph.text[0:4])
         ParagraphPY = Pinyin(re.search('([āáǎàōóǒòēéěèīíǐìūúǔùǖǘǚǜüa-z])+', paragraph.text).group(0))  # 生成Pinyin并比较,找插入的位置
         indexStartPara = 0
         for startPara in startParas:
@@ -75,4 +82,4 @@ for paragraph in document.paragraphs:
         paraInsert = paraBase.insert_paragraph_before()
         fromParatoPara(paraInsert, paragraph)
 document2.save(docxNameto)
-print('finish')
+print('finish, time spent: {:.2f}seconds\nwords count: {}'.format(time.perf_counter()-start, count))

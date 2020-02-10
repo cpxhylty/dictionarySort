@@ -4,12 +4,15 @@ import re
 import time
 
 # steps:
+# 0.doc格式转docx
 # 1.源文件跑removeStartParaSpace，cmd+A cmd+shift+f9去除超链接
-# 2.源文件最前边留一个空段落，跑modify宏
-# 3.源文件英文字体全改为同中文
+# 2.源文件字体全改为宋体/同中文
+# 3.源文件最前边留一个空段落，跑modify宏
 # 4.目标文件最后边需要有1234zzzz段落
 # 5.删掉源文件的第一个空段落，跑process_docx
-# 6.目标文件英文字体全改times
+# 6.删掉1234zzzz，跑归并
+# 7.跑划分
+# 8.所有英文字体全改times
 
 class Pinyin:
     def __init__(self, pinyin):
@@ -44,8 +47,8 @@ def fromParatoPara(parato, parafrom):
                 r._element.rPr.rFonts.set(qn('w:eastAsia'), run.font.name)
         r.bold = run.bold
 
-docxNamefrom = '金梦城1月（6551-6600） .docx'
-docxNameto = 'test3.docx'
+docxNamefrom = '徐东瑞2月（7051-7100）.docx'
+docxNameto = 'test2.docx'
 
 start = time.perf_counter()
 
@@ -82,4 +85,4 @@ for paragraph in document.paragraphs:
         paraInsert = paraBase.insert_paragraph_before()
         fromParatoPara(paraInsert, paragraph)
 document2.save(docxNameto)
-print('finish, time spent: {:.2f}seconds\nwords count: {}'.format(time.perf_counter()-start, count))
+print('finish, time spent: {:.2f} seconds\nwords count: {}'.format(time.perf_counter()-start, count))
